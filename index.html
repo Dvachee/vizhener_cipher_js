@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шифр Веженера - Осинцев</title>
+</head>
+
+<body>
+
+    <div id="result_encryption"></div>
+
+    <div id="encryption" style="margin-bottom: 24px;">
+        <input type="text" id="text" placeholder="Введите текст" />
+        <input type="text" id="key_encryption" placeholder="Введите ключ" />
+        <button id="encryption_btn">Зашифровать</button>
+    </div>
+
+    <div id="result_decryption"></div>
+
+    <div id="decryption">
+        <input type="text" id="key_decryption" placeholder="Введите ключ" />
+        <input type="text" id="cipher" placeholder="Введите шифр" />
+        <button id="decryption_btn">Расшифровать</button>
+    </div>
+
+    <script>
+        const vizhener = {
+            ru: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".split(""),
+            en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+            square: [],
+            genSqViz: function (lang) {
+                const l = this[lang];
+                this[lang].forEach((_, i) => {
+                    this.square[i] = l.slice(i).concat(l.slice(0, i));
+                })
+            },
+            encryption: function (lang, text, key) {
+                if ((lang !== "ru" && lang !== "en") || text.length !== key.length)
+                    return false;
+                this.genSqViz(lang);
+                return text.split('').reduce((acc, cur, i) => {
+                    const row = this[lang].indexOf(cur);
+                    const coll = this[lang].indexOf(key[i])
+                    return acc + this.square[row][coll]
+                }, "")
+            },
+            decryption: function (lang, key, cipher) {
+                if ((lang !== "ru" && lang !== "en") || cipher.length !== key.length)
+                    return false;
+                this.genSqViz(lang);
+                return cipher.split('').reduce((acc, cur, i) => {
+                    const row = this[lang].indexOf(key[i]);
+                    const coll = this.square[row].indexOf(cur)
+                    return acc + this[lang][coll]
+                }, "")
+            }
+        };
+
+        const encryptionBlock = document.getElementById('encryption');
+        const decryptionBlock = document.getElementById('decryption');
+        const encryptionBtn = document.getElementById('encryption_btn');
+        const decryptionBtn = document.getElementById('decryption_btn');
+
+        encryptionBtn.addEventListener('click', () => {
+            document.getElementById('result_encryption').innerText = vizhener.encryption('ru', document.getElementById('text').value, document.getElementById('key_encryption').value)
+        })
+
+        decryptionBtn.addEventListener('click', () => {
+            document.getElementById('result_decryption').innerText = vizhener.decryption('ru', document.getElementById('key_decryption').value, document.getElementById('cipher').value)
+        })
+
+    </script>
+</body>
+
+</html>
